@@ -217,7 +217,8 @@ export class IndexingService {
           totalDocsExamined: timeRangeQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: timeRangeQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: timeRangeQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: timeRangeQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
+          // double inputStage due to limit
+          indexUsed: timeRangeQuery.executionStats?.executionStages?.inputStage?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 
@@ -241,7 +242,7 @@ export class IndexingService {
       const textSearchQuery = await this.salesDataModel.find({
         $text: { $search: 'dashboard analytics' }
       }).explain('executionStats') as any;
-      
+
       results.push({
         query: 'Text search',
         executionStats: {
@@ -602,9 +603,9 @@ export class IndexingService {
 
       // Test case-insensitive query
       const collationQuery = await this.salesDataModel.find({
-        productName: { $regex: /dashboard/i }
+        productName: "dashboard"
       }).collation({ locale: 'en', strength: 2 }).explain('executionStats') as any;
-      
+
       results.push({
         query: 'Case-insensitive collation query',
         executionStats: {

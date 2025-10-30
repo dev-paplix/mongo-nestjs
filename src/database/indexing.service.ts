@@ -200,7 +200,7 @@ export class IndexingService {
           totalDocsExamined: userQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: userQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: userQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: userQuery.executionStats?.inputStage?.indexName || 'COLLSCAN'
+          indexUsed: userQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 
@@ -217,7 +217,7 @@ export class IndexingService {
           totalDocsExamined: timeRangeQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: timeRangeQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: timeRangeQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: timeRangeQuery.executionStats?.inputStage?.indexName || 'COLLSCAN'
+          indexUsed: timeRangeQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 
@@ -233,7 +233,7 @@ export class IndexingService {
           totalDocsExamined: compoundQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: compoundQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: compoundQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: compoundQuery.executionStats?.inputStage?.indexName || 'COLLSCAN'
+          indexUsed: compoundQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 
@@ -566,7 +566,7 @@ export class IndexingService {
           totalDocsExamined: geoQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: geoQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: geoQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: geoQuery.executionStats?.inputStage?.indexName || 'COLLSCAN'
+          indexUsed: geoQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 
@@ -581,7 +581,7 @@ export class IndexingService {
           totalDocsExamined: multikeyQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: multikeyQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: multikeyQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: multikeyQuery.executionStats?.inputStage?.indexName || 'COLLSCAN'
+          indexUsed: multikeyQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 
@@ -596,7 +596,7 @@ export class IndexingService {
           totalDocsExamined: wildcardQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: wildcardQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: wildcardQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: wildcardQuery.executionStats?.inputStage?.indexName || 'COLLSCAN'
+          indexUsed: wildcardQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 
@@ -611,7 +611,7 @@ export class IndexingService {
           totalDocsExamined: collationQuery.executionStats?.totalDocsExamined || 0,
           totalDocsReturned: collationQuery.executionStats?.totalDocsReturned || 0,
           executionTimeMillis: collationQuery.executionStats?.executionTimeMillis || 0,
-          indexUsed: collationQuery.executionStats?.inputStage?.indexName || 'COLLSCAN'
+          indexUsed: collationQuery.executionStats?.executionStages?.inputStage?.indexName || 'COLLSCAN'
         }
       });
 

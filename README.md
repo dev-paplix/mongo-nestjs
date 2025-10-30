@@ -11,6 +11,7 @@ A comprehensive learning platform built with NestJS and MongoDB Atlas to help st
 - **Sales Data Analytics**: Track and analyze sales performance
 - **Real-time Dashboard**: Live metrics and KPI monitoring
 - **Educational Structure**: Well-documented code for learning purposes
+- **🆕 Indexing Exercises**: Comprehensive MongoDB indexing practice with performance analysis
 
 ## 📋 Prerequisites
 
@@ -75,6 +76,18 @@ npm run start:debug
 - `GET /analytics/realtime/dashboard` - Get real-time dashboard data
 - `GET /analytics/realtime/metrics` - Get real-time metrics
 
+### 🆕 MongoDB Indexing Exercises
+- `GET /indexing/learn/basics` - Learn indexing concepts
+- `GET /indexing/learn/exercises` - Get exercise instructions
+- `POST /indexing/exercise/basic` - Create basic single field indexes
+- `POST /indexing/exercise/compound` - Create compound indexes
+- `POST /indexing/exercise/text` - Create text search indexes
+- `POST /indexing/exercise/specialized` - Create sparse and partial indexes
+- `GET /indexing/exercise/performance` - Analyze query performance
+- `POST /indexing/exercise/complete` - Run complete indexing workflow
+- `GET /indexing/indexes` - View all current indexes
+- `DELETE /indexing/indexes` - Remove all custom indexes
+
 ## 🔌 WebSocket Events
 
 Connect to the WebSocket server to receive real-time updates:
@@ -131,6 +144,19 @@ This project helps students learn:
 6. **API Design**: RESTful endpoints and data validation
 7. **Environment Configuration**: Production-ready configuration management
 8. **Error Handling**: Proper error handling and logging
+9. **🆕 MongoDB Indexing**: Comprehensive indexing strategies and performance optimization
+
+## 📚 Additional Learning Modules
+
+### MongoDB Indexing Mastery
+Complete hands-on exercises covering:
+- Single field and compound indexes
+- Text search indexes for full-text search
+- Sparse and partial indexes for optimization
+- Query performance analysis with explain()
+- Index strategy and best practices
+
+**Quick Start**: See [INDEXING_EXERCISES.md](./INDEXING_EXERCISES.md) for detailed instructions.
 
 ## 📁 Project Structure
 

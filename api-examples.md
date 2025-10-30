@@ -127,6 +127,76 @@ curl http://localhost:3000/analytics/realtime/dashboard
 curl http://localhost:3000/analytics/realtime/metrics
 ```
 
+## 🎓 MongoDB Indexing Exercises
+
+### Learn Indexing Basics
+```bash
+curl http://localhost:3000/indexing/learn/basics
+curl http://localhost:3000/indexing/learn/exercises
+curl http://localhost:3000/indexing/learn/performance
+```
+
+### Check Current Indexes
+```bash
+curl http://localhost:3000/indexing/indexes
+```
+
+### Complete Indexing Exercises (Step by Step)
+```bash
+# Exercise 1: Basic single field indexes
+curl -X POST http://localhost:3000/indexing/exercise/basic
+
+# Exercise 2: Compound indexes
+curl -X POST http://localhost:3000/indexing/exercise/compound
+
+# Exercise 3: Text search indexes
+curl -X POST http://localhost:3000/indexing/exercise/text
+
+# Exercise 4: Specialized indexes (sparse & partial)
+curl -X POST http://localhost:3000/indexing/exercise/specialized
+
+# Exercise 5: Performance analysis
+curl http://localhost:3000/indexing/exercise/performance
+```
+
+### Complete Indexing Workflow (All at Once)
+```bash
+curl -X POST http://localhost:3000/indexing/exercise/complete
+```
+
+### Reset Indexes
+```bash
+# Remove all custom indexes (keep only _id)
+curl -X DELETE http://localhost:3000/indexing/indexes
+```
+
+## 🏃‍♂️ Quick Indexing Exercise Workflow
+
+1. **Prepare data:**
+   ```bash
+   curl -X POST "http://localhost:3000/seed/all?userActivities=100&salesData=50"
+   ```
+
+2. **Learn concepts:**
+   ```bash
+   curl http://localhost:3000/indexing/learn/basics
+   ```
+
+3. **Run complete exercise:**
+   ```bash
+   curl -X POST http://localhost:3000/indexing/exercise/complete
+   ```
+
+4. **Analyze results:**
+   - Check execution statistics in the response
+   - Compare performance before/after indexing
+   - Understand which indexes were used
+
+5. **Clean up:**
+   ```bash
+   curl -X DELETE http://localhost:3000/indexing/indexes
+```
+
 ## Quick Start Workflow
 
 1. **Start the server:**

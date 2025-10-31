@@ -10,6 +10,8 @@ By completing these exercises, students will:
 - Analyze query performance using execution statistics
 - Practice index optimization strategies for production workloads
 - Understand advanced indexing concepts like TTL, geospatial, and wildcard indexes
+- **Compare good vs poor performance practices** with real-time metrics
+- **Monitor and optimize database performance** in production scenarios
 
 ## 📋 Prerequisites
 
@@ -34,6 +36,12 @@ By completing these exercises, students will:
 10. **Wildcard Indexes** - Dynamic schema support
 11. **Collation Indexes** - Language and case sensitivity
 12. **Unique Indexes** - Data uniqueness enforcement
+
+### **Performance Monitoring (Real-World Application)**
+13. **Good Performance Practices** - Optimized bulk operations and indexing
+14. **Poor Performance Demonstration** - Anti-patterns and inefficient operations
+15. **Performance Comparison** - Side-by-side analysis with metrics
+16. **Real-time Query Monitoring** - Live performance tracking
 
 ## 🎓 Exercise Structure
 
@@ -199,6 +207,28 @@ curl -X POST http://localhost:3000/indexing/exercise/unique
 curl http://localhost:3000/indexing/exercise/performance
 ```
 
+### Option 4: Performance Optimization Workshop (15 minutes)
+```bash
+# 1. Setup with sufficient data
+curl -X POST "http://localhost:3000/seed/all?userActivities=500&salesData=200"
+
+# 2. Create indexes for optimal performance
+curl -X POST http://localhost:3000/indexing/exercise/basic
+curl -X POST http://localhost:3000/indexing/exercise/compound
+
+# 3. Monitor current query performance
+curl http://localhost:3000/indexing/performance/monitor-queries
+
+# 4. Test good performance practices
+curl -X POST "http://localhost:3000/indexing/performance/good-insert?count=1000"
+
+# 5. Test poor performance practices (smaller count!)
+curl -X POST "http://localhost:3000/indexing/performance/poor-insert?count=500"
+
+# 6. Direct comparison with recommendations
+curl -X POST "http://localhost:3000/indexing/performance/compare?count=1000"
+```
+
 ## 🎯 Real-World Index Applications
 
 ### **E-commerce Platform**
@@ -259,6 +289,135 @@ curl http://localhost:3000/indexing/exercise/performance
   }
 }
 ```
+
+## ⚡ Performance Monitoring & Optimization
+
+### **Understanding Performance Impact**
+These exercises demonstrate **real-world performance differences** between optimized and unoptimized database operations.
+
+#### **Exercise 13: Good Performance Data Insertion**
+**Demonstrates**: Bulk operations, proper indexing, optimized batching
+```bash
+# Insert 1000 documents with best practices
+curl -X POST "http://localhost:3000/indexing/performance/good-insert?count=1000"
+```
+**PowerShell**:
+```powershell
+Invoke-RestMethod -Uri "http://localhost:3000/indexing/performance/good-insert?count=1000" -Method POST
+```
+
+**What happens**:
+- ✅ Creates optimal indexes first
+- ✅ Uses `insertMany()` with batch size of 100
+- ✅ Uses unordered inserts for better parallelization
+- ✅ Optimized write concerns for bulk operations
+- ✅ Real-time performance metrics
+
+**Expected Results**:
+- **Speed**: 500-2000+ documents per second
+- **Memory**: Efficient memory usage
+- **Time**: Usually completes in under 2 seconds
+
+#### **Exercise 14: Poor Performance Data Insertion**
+**Demonstrates**: Single document inserts, no indexing, inefficient operations
+```bash
+# Insert 500 documents with poor practices (use smaller count!)
+curl -X POST "http://localhost:3000/indexing/performance/poor-insert?count=500"
+```
+**PowerShell**:
+```powershell
+Invoke-RestMethod -Uri "http://localhost:3000/indexing/performance/poor-insert?count=500" -Method POST
+```
+
+**What happens**:
+- ❌ Removes all indexes first
+- ❌ Uses individual `create()` calls
+- ❌ No batching or optimization
+- ❌ Inefficient document structures
+- ❌ Bloated metadata and oversized documents
+
+**Expected Results**:
+- **Speed**: 10-50 documents per second
+- **Memory**: High memory usage due to oversized documents
+- **Time**: Can take 30+ seconds for 500 documents
+
+#### **Exercise 15: Performance Strategy Comparison**
+**Compares**: Both approaches side-by-side with quantified metrics
+```bash
+# Direct comparison with performance metrics
+curl -X POST "http://localhost:3000/indexing/performance/compare?count=1000"
+```
+**PowerShell**:
+```powershell
+Invoke-RestMethod -Uri "http://localhost:3000/indexing/performance/compare?count=1000" -Method POST
+```
+
+**What you'll see**:
+```json
+{
+  "performanceDifference": {
+    "speedImprovement": 15.5,  // Good practice is 15.5x faster
+    "timeReduction": 94,       // 94% time reduction
+    "timeDifferenceMs": 28500  // 28.5 seconds saved
+  },
+  "recommendations": [
+    "Use bulk operations (insertMany) instead of individual inserts",
+    "Create appropriate indexes before bulk inserts",
+    "Use optimal batch sizes (50-100 documents)",
+    "Use unordered inserts for better parallelization"
+  ]
+}
+```
+
+#### **Exercise 16: Real-time Query Performance Monitoring**
+**Monitors**: Live query execution across all index types
+```bash
+# Monitor various query patterns and their performance
+curl http://localhost:3000/indexing/performance/monitor-queries
+```
+**PowerShell**:
+```powershell
+Invoke-RestMethod -Uri "http://localhost:3000/indexing/performance/monitor-queries"
+```
+
+**Tests performed**:
+- Simple index scans
+- Range queries with timestamps
+- Compound index utilization
+- Text search performance
+- Aggregation pipeline efficiency
+
+### **📊 Performance Insights**
+
+#### **Typical Performance Differences**
+| Operation | Good Practice | Poor Practice | Improvement |
+|-----------|---------------|---------------|-------------|
+| **Insert 1000 docs** | 0.5-2 seconds | 20-60 seconds | **10-100x faster** |
+| **Simple query** | 1-5ms | 50-200ms | **10-40x faster** |
+| **Range query** | 2-10ms | 100-500ms | **20-50x faster** |
+| **Text search** | 5-20ms | 200-1000ms | **20-100x faster** |
+
+#### **Key Optimization Strategies**
+1. **Bulk Operations**: Use `insertMany()` instead of individual inserts
+2. **Index First**: Create indexes before bulk data operations
+3. **Batch Size**: Optimal batch sizes (50-100 documents)
+4. **Write Concerns**: Use appropriate write concerns for bulk ops
+5. **Unordered Inserts**: Enable parallelization with `ordered: false`
+6. **Document Structure**: Keep documents lean and well-structured
+
+#### **Production Best Practices**
+- Monitor query performance with `explain()` regularly
+- Use MongoDB Profiler to identify slow operations
+- Create compound indexes for multi-field queries
+- Use projection to limit returned fields
+- Implement proper data archiving with TTL indexes
+- Consider read preferences for read-heavy workloads
+
+### **🚨 Warning: Resource Usage**
+- **Good Performance**: Start with 100-1000 documents
+- **Poor Performance**: Start with 50-500 documents (it's much slower!)
+- Monitor your system resources during large operations
+- The poor performance examples are intentionally inefficient for learning purposes
 
 ## 🧹 Cleanup and Reset
 

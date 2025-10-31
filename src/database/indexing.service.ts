@@ -758,6 +758,341 @@ export class IndexingService {
     }
   }
 
+  // Performance Monitoring: Good Practice - Bulk Insert with Optimized Operations
+  async insertDataWithGoodPerformance(documentCount: number = 1000) {
+    this.logger.log(`🚀 Inserting ${documentCount} documents with GOOD performance practices`);
+    
+    const startTime = Date.now();
+    const batchSize = 100; // Optimal batch size
+    const results = {
+      strategy: 'Good Performance',
+      documentCount,
+      batchSize,
+      metrics: {
+        totalTime: 0,
+        averageTimePerBatch: 0,
+        documentsPerSecond: 0,
+        memoryUsage: process.memoryUsage(),
+        operationDetails: []
+      }
+    };
+
+    try {
+      // 1. Create optimal indexes first
+      await this.createBasicIndexes();
+      await this.createCompoundIndexes();
+
+      // 2. Prepare data in batches
+      const batches = [];
+      for (let i = 0; i < documentCount; i += batchSize) {
+        const batch = [];
+        for (let j = 0; j < batchSize && (i + j) < documentCount; j++) {
+          const doc = this.generateOptimizedDocument(i + j);
+          batch.push(doc);
+        }
+        batches.push(batch);
+      }
+
+      // 3. Insert in optimized batches with monitoring
+      for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
+        const batchStartTime = Date.now();
+        
+        // Use ordered: false for better performance
+        await this.userActivityModel.insertMany(batches[batchIndex], { 
+          ordered: false
+        });
+        
+        const batchEndTime = Date.now();
+        const batchTime = batchEndTime - batchStartTime;
+        
+        results.metrics.operationDetails.push({
+          batch: batchIndex + 1,
+          documents: batches[batchIndex].length,
+          timeMs: batchTime,
+          docsPerSecond: Math.round((batches[batchIndex].length / batchTime) * 1000)
+        });
+
+        // Log progress every 10 batches
+        if ((batchIndex + 1) % 10 === 0) {
+          this.logger.log(`✅ Processed ${batchIndex + 1}/${batches.length} batches`);
+        }
+      }
+
+      const endTime = Date.now();
+      results.metrics.totalTime = endTime - startTime;
+      results.metrics.averageTimePerBatch = results.metrics.totalTime / batches.length;
+      results.metrics.documentsPerSecond = Math.round((documentCount / results.metrics.totalTime) * 1000);
+
+      this.logger.log(`✅ Good performance insert completed: ${results.metrics.documentsPerSecond} docs/sec`);
+      return results;
+
+    } catch (error) {
+      this.logger.error('❌ Good performance insert failed:', error);
+      throw error;
+    }
+  }
+
+  // Performance Monitoring: Poor Practice - Individual Inserts without Optimization
+  async insertDataWithPoorPerformance(documentCount: number = 1000) {
+    this.logger.log(`🐌 Inserting ${documentCount} documents with POOR performance practices`);
+    
+    const startTime = Date.now();
+    const results = {
+      strategy: 'Poor Performance',
+      documentCount,
+      batchSize: 1, // Single document inserts
+      metrics: {
+        totalTime: 0,
+        averageTimePerDoc: 0,
+        documentsPerSecond: 0,
+        memoryUsage: process.memoryUsage(),
+        operationDetails: []
+      }
+    };
+
+    try {
+      // 1. No indexes (worst case scenario)
+      await this.dropAllCustomIndexes();
+
+      // 2. Insert documents one by one (anti-pattern)
+      for (let i = 0; i < documentCount; i++) {
+        const docStartTime = Date.now();
+        
+        // Generate inefficient document structure
+        const doc = this.generateInefficientDocument(i);
+        
+        // Use inefficient write concern
+        await this.userActivityModel.create(doc);
+        
+        const docEndTime = Date.now();
+        const docTime = docEndTime - docStartTime;
+        
+        if (i < 100 || i % 100 === 0) { // Record first 100 and every 100th
+          results.metrics.operationDetails.push({
+            document: i + 1,
+            timeMs: docTime,
+            cumulativeTimeMs: docEndTime - startTime
+          });
+        }
+
+        // Log progress every 100 documents
+        if ((i + 1) % 100 === 0) {
+          const currentRate = Math.round(((i + 1) / (docEndTime - startTime)) * 1000);
+          this.logger.log(`⏳ Processed ${i + 1}/${documentCount} documents (${currentRate} docs/sec)`);
+        }
+      }
+
+      const endTime = Date.now();
+      results.metrics.totalTime = endTime - startTime;
+      results.metrics.averageTimePerDoc = results.metrics.totalTime / documentCount;
+      results.metrics.documentsPerSecond = Math.round((documentCount / results.metrics.totalTime) * 1000);
+
+      this.logger.log(`❌ Poor performance insert completed: ${results.metrics.documentsPerSecond} docs/sec`);
+      return results;
+
+    } catch (error) {
+      this.logger.error('❌ Poor performance insert failed:', error);
+      throw error;
+    }
+  }
+
+  // Performance Comparison: Run Both Strategies and Compare
+  async comparePerformanceStrategies(documentCount: number = 1000) {
+    this.logger.log(`🏁 Comparing performance strategies with ${documentCount} documents`);
+    
+    try {
+      // Clear collections for fair comparison
+      await this.userActivityModel.deleteMany({});
+      
+      // Test good performance strategy
+      const goodResults = await this.insertDataWithGoodPerformance(documentCount);
+      
+      // Clear collection again
+      await this.userActivityModel.deleteMany({});
+      
+      // Test poor performance strategy
+      const poorResults = await this.insertDataWithPoorPerformance(documentCount);
+
+      // Calculate performance differences
+      const comparison = {
+        documentCount,
+        goodPerformance: goodResults.metrics,
+        poorPerformance: poorResults.metrics,
+        performanceDifference: {
+          speedImprovement: Math.round((goodResults.metrics.documentsPerSecond / poorResults.metrics.documentsPerSecond) * 100) / 100,
+          timeReduction: Math.round(((poorResults.metrics.totalTime - goodResults.metrics.totalTime) / poorResults.metrics.totalTime) * 100),
+          timeDifferenceMs: poorResults.metrics.totalTime - goodResults.metrics.totalTime
+        },
+        recommendations: [
+          'Use bulk operations (insertMany) instead of individual inserts',
+          'Create appropriate indexes before bulk inserts',
+          'Use optimal batch sizes (50-100 documents)',
+          'Use unordered inserts for better parallelization',
+          'Optimize write concerns for bulk operations',
+          'Monitor memory usage during large operations'
+        ],
+        timestamp: new Date()
+      };
+
+      this.logger.log(`📊 Performance comparison completed:`);
+      this.logger.log(`   Good: ${goodResults.metrics.documentsPerSecond} docs/sec`);
+      this.logger.log(`   Poor: ${poorResults.metrics.documentsPerSecond} docs/sec`);
+      this.logger.log(`   Improvement: ${comparison.performanceDifference.speedImprovement}x faster`);
+
+      return comparison;
+
+    } catch (error) {
+      this.logger.error('❌ Performance comparison failed:', error);
+      throw error;
+    }
+  }
+
+  // Advanced Performance Monitoring with Real-time Metrics
+  async monitorQueryPerformance() {
+    this.logger.log('📈 Starting advanced query performance monitoring');
+    
+    try {
+      const testQueries = [
+        {
+          name: 'Simple Index Scan',
+          query: () => this.userActivityModel.find({ userId: 'user_50' }),
+          expectedIndex: 'idx_userId'
+        },
+        {
+          name: 'Range Query',
+          query: () => this.userActivityModel.find({
+            timestamp: { $gte: new Date(Date.now() - 24 * 60 * 60 * 1000) }
+          }),
+          expectedIndex: 'idx_timestamp_desc'
+        },
+        {
+          name: 'Compound Index Query',
+          query: () => this.userActivityModel.find({
+            userId: 'user_25',
+            action: 'page_view'
+          }),
+          expectedIndex: 'idx_action_page'
+        },
+        {
+          name: 'Text Search',
+          query: () => this.salesDataModel.find({
+            $text: { $search: 'dashboard' }
+          }),
+          expectedIndex: 'TEXT'
+        },
+        {
+          name: 'Aggregation Pipeline',
+          query: () => this.userActivityModel.aggregate([
+            { $match: { action: 'purchase' } },
+            { $group: { _id: '$userId', count: { $sum: 1 } } },
+            { $sort: { count: -1 } },
+            { $limit: 10 }
+          ]),
+          expectedIndex: 'idx_action'
+        }
+      ];
+
+      const results = [];
+
+      for (const test of testQueries) {
+        this.logger.log(`🔍 Testing: ${test.name}`);
+        
+        // Run query with explain
+        const startTime = Date.now();
+        const explainResult = await test.query().explain('executionStats') as any;
+        const queryTime = Date.now() - startTime;
+
+        // Extract performance metrics
+        const stats = explainResult.executionStats || explainResult.stages?.[0]?.$cursor?.executionStats;
+        
+        const performance = {
+          queryName: test.name,
+          expectedIndex: test.expectedIndex,
+          actualIndex: stats?.executionStages?.inputStage?.indexName || 
+                      stats?.executionStages?.indexName ||
+                      'COLLSCAN',
+          executionTimeMs: stats?.executionTimeMillis || queryTime,
+          totalDocsExamined: stats?.totalDocsExamined || 0,
+          totalDocsReturned: stats?.totalDocsReturned || 0,
+          keysExamined: stats?.totalKeysExamined || 0,
+          indexUsed: (stats?.executionStages?.inputStage?.indexName || 
+                     stats?.executionStages?.indexName) ? true : false,
+          efficiency: stats?.totalDocsExamined > 0 ? 
+                     Math.round((stats.totalDocsReturned / stats.totalDocsExamined) * 100) : 100,
+          timestamp: new Date()
+        };
+
+        results.push(performance);
+
+        // Log results
+        const indexStatus = performance.indexUsed ? '✅ Index Used' : '❌ Collection Scan';
+        this.logger.log(`   ${indexStatus}: ${performance.actualIndex}`);
+        this.logger.log(`   Time: ${performance.executionTimeMs}ms, Docs: ${performance.totalDocsReturned}/${performance.totalDocsExamined}`);
+      }
+
+      return {
+        title: 'Query Performance Monitoring Results',
+        testCount: testQueries.length,
+        results,
+        summary: {
+          queriesUsingIndexes: results.filter(r => r.indexUsed).length,
+          averageExecutionTime: Math.round(results.reduce((sum, r) => sum + r.executionTimeMs, 0) / results.length),
+          totalDocsExamined: results.reduce((sum, r) => sum + r.totalDocsExamined, 0),
+          totalDocsReturned: results.reduce((sum, r) => sum + r.totalDocsReturned, 0),
+          overallEfficiency: Math.round((results.reduce((sum, r) => sum + r.efficiency, 0) / results.length))
+        },
+        timestamp: new Date()
+      };
+
+    } catch (error) {
+      this.logger.error('❌ Query performance monitoring failed:', error);
+      throw error;
+    }
+  }
+
+  // Generate optimized document for good performance testing
+  private generateOptimizedDocument(index: number) {
+    return {
+      userId: `user_${Math.floor(index / 10)}`, // Predictable for indexing
+      action: ['page_view', 'click', 'purchase', 'search'][index % 4],
+      timestamp: new Date(Date.now() - (index * 1000)), // Sequential timestamps
+      page: `/page-${Math.floor(index / 100)}`,
+      duration: Math.floor(Math.random() * 300) + 10,
+      // Minimal, well-structured data
+      metadata: {
+        browser: 'Chrome',
+        device: 'desktop'
+      }
+    };
+  }
+
+  // Generate inefficient document for poor performance testing
+  private generateInefficientDocument(index: number) {
+    return {
+      userId: `user_${Math.random().toString(36).substring(7)}_${index}`, // Random, non-indexable
+      action: `action_${Math.random().toString(36).substring(7)}`, // Unique actions
+      timestamp: new Date(Date.now() - Math.random() * 10000000), // Random timestamps
+      page: `/page-${Math.random().toString(36).substring(7)}`, // Random pages
+      duration: Math.floor(Math.random() * 300) + 10,
+      // Oversized, unstructured data
+      metadata: {
+        browser: Math.random().toString(36).substring(7),
+        device: Math.random().toString(36).substring(7),
+        userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'.repeat(5),
+        cookies: Array(50).fill(null).map(() => Math.random().toString(36).substring(7)),
+        sessionData: {
+          largeArray: Array(100).fill(null).map(() => ({
+            id: Math.random().toString(36).substring(7),
+            value: Math.random().toString(36).substring(7),
+            nested: {
+              data: Array(10).fill(null).map(() => Math.random().toString(36).substring(7))
+            }
+          }))
+        }
+      }
+    };
+  }
+
   // Complete indexing exercise workflow
   async runCompleteIndexingExercise() {
     this.logger.log('🎓 Running Complete Indexing Exercise');

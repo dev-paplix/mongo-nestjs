@@ -71,6 +71,30 @@ export class IndexingController {
     return this.indexingService.analyzeIndexPerformance();
   }
 
+  // Performance Monitoring Endpoints
+  @Post('performance/good-insert')
+  async insertDataWithGoodPerformance(@Query('count') count?: string) {
+    const documentCount = count ? parseInt(count, 10) : 1000;
+    return this.indexingService.insertDataWithGoodPerformance(documentCount);
+  }
+
+  @Post('performance/poor-insert')
+  async insertDataWithPoorPerformance(@Query('count') count?: string) {
+    const documentCount = count ? parseInt(count, 10) : 1000;
+    return this.indexingService.insertDataWithPoorPerformance(documentCount);
+  }
+
+  @Post('performance/compare')
+  async comparePerformanceStrategies(@Query('count') count?: string) {
+    const documentCount = count ? parseInt(count, 10) : 1000;
+    return this.indexingService.comparePerformanceStrategies(documentCount);
+  }
+
+  @Get('performance/monitor-queries')
+  async monitorQueryPerformance() {
+    return this.indexingService.monitorQueryPerformance();
+  }
+
   // Complete exercise workflow
   @Post('exercise/complete')
   async runCompleteIndexingExercise() {
@@ -381,6 +405,50 @@ export class IndexingController {
             'Understand query optimization',
             'Real-world performance testing'
           ]
+        },
+        {
+          number: 14,
+          title: 'Good Performance Data Insertion',
+          description: 'Demonstrate optimized bulk insert operations',
+          endpoint: 'POST /indexing/performance/good-insert?count=1000',
+          learningGoals: [
+            'Learn bulk operation best practices',
+            'Understand batch size optimization',
+            'Monitor insertion performance metrics'
+          ]
+        },
+        {
+          number: 15,
+          title: 'Poor Performance Data Insertion',
+          description: 'Show inefficient single-document operations',
+          endpoint: 'POST /indexing/performance/poor-insert?count=1000',
+          learningGoals: [
+            'Recognize performance anti-patterns',
+            'See impact of missing indexes',
+            'Understand inefficient operations'
+          ]
+        },
+        {
+          number: 16,
+          title: 'Performance Strategy Comparison',
+          description: 'Direct comparison of good vs poor practices',
+          endpoint: 'POST /indexing/performance/compare?count=1000',
+          learningGoals: [
+            'Quantify performance differences',
+            'Learn optimization strategies',
+            'Get actionable recommendations'
+          ]
+        },
+        {
+          number: 17,
+          title: 'Real-time Query Performance Monitoring',
+          description: 'Monitor live query performance across index types',
+          endpoint: 'GET /indexing/performance/monitor-queries',
+          learningGoals: [
+            'Monitor query execution in real-time',
+            'Validate index usage patterns',
+            'Identify optimization opportunities'
+          ]
         }
       ],
       workflow: [
@@ -390,9 +458,21 @@ export class IndexingController {
         '4. Run advanced exercises (5-11): TTL, Geospatial, Multikey, Hashed, Wildcard, Collation, Unique',
         '5. Analyze performance: GET /indexing/exercise/performance',
         '6. Advanced performance: GET /indexing/exercise/performance-advanced',
-        '7. Complete basic workflow: POST /indexing/exercise/complete',
-        '8. Complete advanced workflow: POST /indexing/exercise/advanced',
-        '9. Clean up: DELETE /indexing/indexes'
+        '7. Monitor queries: GET /indexing/performance/monitor-queries',
+        '8. Test good performance: POST /indexing/performance/good-insert?count=1000',
+        '9. Test poor performance: POST /indexing/performance/poor-insert?count=500',
+        '10. Compare strategies: POST /indexing/performance/compare?count=1000',
+        '11. Complete basic workflow: POST /indexing/exercise/complete',
+        '12. Complete advanced workflow: POST /indexing/exercise/advanced',
+        '13. Clean up: DELETE /indexing/indexes'
+      ],
+      performanceTips: [
+        'Start with smaller document counts (100-500) for initial testing',
+        'Good performance uses: bulk operations, proper indexes, optimized batching',
+        'Poor performance shows: single inserts, no indexes, inefficient data structures',
+        'Performance difference can be 10-100x between good and poor practices',
+        'Monitor memory usage during large bulk operations',
+        'Use the comparison endpoint to see quantified improvements'
       ]
     };
   }
